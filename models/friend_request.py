@@ -11,5 +11,7 @@ class FriendRequest(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
+    __table_args__ = (db.UniqueConstraint('sender_id', 'receiver_id', name='sender_receiver_uc'),)
+
     sender = relationship('User', back_populates='friend_requests_sent', foreign_keys='FriendRequest.sender_id')
     receiver = relationship('User', back_populates='friend_requests_received', foreign_keys='FriendRequest.receiver_id')

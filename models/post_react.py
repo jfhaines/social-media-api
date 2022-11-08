@@ -8,7 +8,7 @@ class PostReact(db.Model):
     type = db.Column(db.String, nullable=False)
     date_time = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
 
     user = db.relationship('User', back_populates='post_reacts')

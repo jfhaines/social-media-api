@@ -4,6 +4,7 @@ from controllers.auth_controller import auth_bp
 from controllers.user_controller import users_bp
 from controllers.post_controller import posts_bp
 from controllers.comment_controller import comments_bp
+from controllers.post_react_controller import post_reacts_bp
 from cli_commands import db_commands
 import os
 
@@ -25,5 +26,6 @@ def create_app():
     app.register_blueprint(db_commands)
     app.register_blueprint(posts_bp)
     app.register_blueprint(comments_bp)
+    app.register_blueprint(post_reacts_bp)
 
     return app
