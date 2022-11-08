@@ -53,3 +53,22 @@ def delete_user(user_id):
         return {'message': f'User {user.id} deleted successfully'}
     else:
         return {'error': f'There is no user with id {user_id}'}, 404
+
+
+@users_bp.route('/', methods=['GET'])
+@jwt_required()
+def read_users():
+    stmt = select(User)
+    users = db.session.scalars(stmt)
+    return UserSchema(many=True, exclude=['password', 'dob', 'is_admin']).dump(users)
+
+@users_bp.route('/<int:user_id>', methods=['GET'])
+@jwt_required()
+def read_user(user_id):
+    stmt = select(User).where(User.id == user_id)
+    user = db.session.scalar(stmt)
+
+    if user:
+        return UserSchema(exclude=['password', 'dob', 'is_admin']).dump(user)
+    else:
+        return {'error': f'There is no user with id {user_id}'}, 404
