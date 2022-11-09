@@ -14,7 +14,7 @@ friend_requests_bp = Blueprint('friend_requests', __name__, url_prefix='users/<i
 @friend_requests_bp.route('/', methods=['GET'])
 @jwt_required()
 def read_friend_requests(user_id):
-    stmt = select(FriendRequest)
+    stmt = select(FriendRequest).where(FriendRequest.receiver_id == user_id)
     friend_requests = db.session.scalars(stmt)
     return FriendRequestSchema(many=True).dump(friend_requests)
 
