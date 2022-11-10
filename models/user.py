@@ -8,15 +8,17 @@ class User(db.Model):
     email = db.Column(db.String(75), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     dob = db.Column(db.Date, nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
 
     posts = db.relationship('Post', back_populates='user')
     comments = db.relationship('Comment', back_populates='user')
     post_reacts = db.relationship('PostReact', back_populates='user')
     comment_reacts = db.relationship('CommentReact', back_populates='user')
-    
-    friend_requests_sent = db.relationship('FriendRequest', back_populates='sender', foreign_keys='FriendRequest.sender_id')
-    friend_requests_received = db.relationship('FriendRequest', back_populates='receiver', foreign_keys='FriendRequest.receiver_id')
 
-    friends1 = db.relationship('Friend', back_populates='friend1', foreign_keys='Friend.friend1_id')
-    friends2 = db.relationship('Friend', back_populates='friend2', foreign_keys='Friend.friend2_id')
+    friendships1 = db.relationship('Friendship', back_populates='user1', foreign_keys='Friendship.user1_id')
+    friendships2 = db.relationship('Friendship', back_populates='user2', foreign_keys='Friendship.user2_id')
+
+    __table_args__ = (db.CheckConstraint("username ~ '[a-zA-Z0-9!?]*'", 'valid_username_chars_cc'),
+                      db.CheckConstraint('char_length(username) >= 1 and char_length(username) <=100', 'valid_username_length_cc'),
+                      db.CheckConstraint("email ~ '[a-zA-Z0-9._]+@[a-zA-Z0-9._]+.com[a-zA-Z.]*'", 'valid_email_cc'),
+                      db.CheckConstraint('dob <= NOW()', 'valid_dob_cc'))

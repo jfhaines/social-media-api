@@ -14,3 +14,7 @@ class Comment(db.Model):
     user = db.relationship('User', back_populates='comments')
     post = db.relationship('Post', back_populates='comments')
     comment_reacts = db.relationship('CommentReact', back_populates='comment')
+
+    __table_args__ = (db.CheckConstraint("text ~ '[a-zA-Z0-9!?]*'", 'valid_comment_text_chars_cc'),
+                      db.CheckConstraint('char_length(text) >=1 and char_length(text) <= 400', 'valid_comment_text_length_cc'),
+                      db.CheckConstraint('date_time <= NOW()', 'valid_comment_date_time_cc'))

@@ -4,8 +4,7 @@ from models.post import Post
 from models.comment import Comment
 from models.post_react import PostReact
 from models.comment_react import CommentReact
-from models.friend import Friend
-from models.friend_request import FriendRequest
+from models.friendship import Friendship
 from init import db, bcrypt
 from datetime import date, datetime
 from flask_jwt_extended import jwt_required
@@ -28,28 +27,28 @@ def seed_tables():
         User(
             username='user1',
             email='user1@example.com',
-            password=bcrypt.generate_password_hash('password'),
+            password=bcrypt.generate_password_hash('password', 10).decode('utf-8'),
             is_admin=True,
             dob=date(1998, 5, 6)
         ),
         User(
             username='user2',
             email='user2@example.com',
-            password=bcrypt.generate_password_hash('password'),
+            password=bcrypt.generate_password_hash('password', 10).decode('utf-8'),
             is_admin=False,
             dob=date(2000, 10, 9)
         ),
         User(
             username='user3',
             email='user3@example.com',
-            password=bcrypt.generate_password_hash('password'),
+            password=bcrypt.generate_password_hash('password', 10).decode('utf-8'),
             is_admin=False,
             dob=date(2002, 11, 5)
         ),
         User(
             username='user4',
             email='user4@example.com',
-            password=bcrypt.generate_password_hash('password'),
+            password=bcrypt.generate_password_hash('password', 10).decode('utf-8'),
             is_admin=False,
             dob=date(2001, 4, 27)
         )
@@ -93,13 +92,13 @@ def seed_tables():
 
     post_reacts = [
         PostReact(
-            type='Like',
+            type=1,
             date_time=datetime.now(),
             user_id=users[0].id,
             post_id=posts[1].id
         ),
         PostReact(
-            type='Laugh',
+            type=2,
             date_time=datetime.now(),
             user_id=users[1].id,
             post_id=posts[0].id
@@ -110,13 +109,13 @@ def seed_tables():
 
     comment_reacts = [
         CommentReact(
-            type='Laugh',
+            type=4,
             date_time=datetime.now(),
             user_id=users[0].id,
             comment_id=comments[1].id
         ),
         CommentReact(
-            type='Like',
+            type=5,
             date_time=datetime.now(),
             user_id=users[1].id,
             comment_id=comments[0].id
@@ -125,34 +124,23 @@ def seed_tables():
     db.session.add_all(comment_reacts)
     db.session.commit()
 
-    friend_requests = [
-        FriendRequest(
-            sender_id=users[0].id,
-            receiver_id=users[1].id,
-            date_time=datetime.now()
+    friendships = [
+        Friendship(
+            user1_id=users[0].id,
+            user2_id=users[1].id,
+            date_time=datetime.now(),
+            requester=1,
+            status=0
         ),
-        FriendRequest(
-            sender_id=users[0].id,
-            receiver_id=users[2].id,
-            date_time=datetime.now()
-        ),
-        FriendRequest(
-            sender_id=users[3].id,
-            receiver_id=users[0].id,
-            date_time=datetime.now()
+        Friendship(
+            user1_id=users[2].id,
+            user2_id=users[3].id,
+            date_time=datetime.now(),
+            requester=2,
+            status=1
         )
     ]
-    db.session.add_all(friend_requests)
-    db.session.commit()
-
-    friends = [
-        Friend(
-            friend1_id=users[3].id,
-            friend2_id=users[2].id,
-            date_time=datetime.now()
-        )
-    ]
-    db.session.add_all(friends)
+    db.session.add_all(friendships)
     db.session.commit()
 
     print('Tables seeded')

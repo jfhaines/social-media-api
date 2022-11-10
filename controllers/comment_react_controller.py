@@ -8,7 +8,7 @@ from sqlalchemy import select
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 
-comment_reacts_bp = Blueprint('comment_reacts', __name__, url_prefix='posts/<int:post_id>/comments/<int:comment_id>/comment_reacts')
+comment_reacts_bp = Blueprint('comment_reacts', __name__, url_prefix='/posts/<int:post_id>/comments/<int:comment_id>/comment_reacts')
 
 @comment_reacts_bp.route('/', methods=['GET'])
 @jwt_required()
