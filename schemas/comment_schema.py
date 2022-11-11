@@ -9,17 +9,17 @@ class CommentSchema(ma.Schema):
     post = fields.Nested('PostSchema')
 
     text = fields.String(required=True, validate=And(
-        Regexp('[a-zA-Z0-9!?]*', error='Invalid input for comment text'),
-        Length(min=1, max=400, error='Text has the wrong number of characters')
+        Regexp('[a-zA-Z0-9!?]*', error='Invalid characters'),
+        Length(min=1, max=400, error='Invalid number of characters.')
         ))
-    date_time = fields.DateTime(required=True, load_default=datetime.now())
+    date_time = fields.DateTime(load_default=datetime.now())
     user_id = fields.Integer(required=True)
     post_id = fields.Integer(required=True)
 
     @validates('date_time')
     def validate_date_time(self, value):
         if value >= datetime.now():
-            raise ValidationError('You cannot set a future time and date')
+            raise ValidationError('You cannot set a future time and date.')
 
 
     class Meta:

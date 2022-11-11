@@ -15,5 +15,4 @@ class CommentReact(db.Model):
     comment = db.relationship('Comment', back_populates='comment_reacts')
 
     __table_args__ = (db.UniqueConstraint('user_id', 'comment_id', name='comment_react_uc'),
-                      db.CheckConstraint("type > 0 and type < 6", 'valid_comment_react_type_cc'),
-                      db.CheckConstraint('date_time <= NOW()', 'valid_comment_react_date_time_cc'))
+                      db.CheckConstraint("type > 0 and type < 6", 'valid_comment_react_type_cc'))

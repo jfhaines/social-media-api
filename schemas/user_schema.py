@@ -13,18 +13,24 @@ class UserSchema(ma.Schema):
     friendships2 = fields.List(fields.Nested('FriendSchema', exclude=['user']))
 
     username = fields.String(required=True, validate=And(
-        Regexp('[a-zA-Z0-9!?]*', error='Invalid input for username'),
-        Length(min=1, max=100, error='Username has the wrong number of characters')
+        Regexp('[a-zA-Z0-9!?]*', error='Invalid characters.'),
+        Length(min=1, max=100, error='Invalid number of characters.')
         ))
     email = fields.Email(required=True)
-    dob = fields.Date(required=True)
-    password = fields.String(required=True, validate=Length(min=7, error='Password is not long enough'))
-    is_admin = fields.Boolean(required=True, load_default=False)
+    dob = fields.String(required=True)
+    password = fields.String(required=True, validate=Length(min=7, error='Invalid number of characters.'))
+    is_admin = fields.Boolean(load_default=False)
 
     @validates('dob')
     def validate_dob(self, value):
-        if value >= date.today():
-            raise ValidationError('You cannot be born in the future')
+        try:
+            date_data = value.split('/')
+            day = int(date_data[0])
+            month = int(date_data[1])
+            year = int(date_data[2])
+            date(year, month, day)
+        except:
+            raise ValidationError('Must be a valid date represented as a string in the "DD/MM/YYYY" format.')
 
     class Meta:
         fields = ('id', 'username', 'email', 'password', 'dob', 'is_admin')

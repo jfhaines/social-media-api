@@ -21,4 +21,4 @@ class User(db.Model):
     __table_args__ = (db.CheckConstraint("username ~ '[a-zA-Z0-9!?]*'", 'valid_username_chars_cc'),
                       db.CheckConstraint('char_length(username) >= 1 and char_length(username) <=100', 'valid_username_length_cc'),
                       db.CheckConstraint("email ~ '[a-zA-Z0-9._]+@[a-zA-Z0-9._]+.com[a-zA-Z.]*'", 'valid_email_cc'),
-                      db.CheckConstraint('dob <= NOW()', 'valid_dob_cc'))
+                      db.CheckConstraint('dob < NOW()::date', 'valid_dob_cc'))

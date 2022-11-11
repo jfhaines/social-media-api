@@ -18,5 +18,4 @@ class Post(db.Model):
     __table_args__ = (db.CheckConstraint("title ~ '[a-zA-Z0-9!?]*'", 'valid_post_title_chars_cc'),
                       db.CheckConstraint('char_length(title) >=1 and char_length(title) <=150', 'valid_post_title_length_cc'),
                       db.CheckConstraint("text ~ '[a-zA-Z0-9!?]*'", 'valid_post_text_chars_cc'),
-                      db.CheckConstraint('char_length(text) >=1 and char_length(text) <= 400', 'valid_post_text_length_cc'),
-                      db.CheckConstraint('date_time <= NOW()', 'valid_post_date_time_cc'))
+                      db.CheckConstraint('char_length(text) >=1 and char_length(text) <= 400', 'valid_post_text_length_cc'))

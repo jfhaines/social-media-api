@@ -12,11 +12,10 @@ class Friendship(db.Model):
     requester = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer, nullable=False, default=0)
 
-    __table_args__ = (db.UniqueConstraint('user1_id', 'user2_id', name='friendship_users_uc'),
-                      db.CheckConstraint('user1_id < user2_id', name='friendship_user_ids_sorted_cc'),
-                      db.CheckConstraint('date_time <= NOW()', 'valid_friendship_date_time_cc'),
-                      db.CheckConstraint('requester >= 1 and requester <=2', 'valid_friendship_requester_cc'),
-                      db.CheckConstraint('status >= 0 and status <=1', 'valid_friendship_status_cc'))
-
     user1 = db.relationship('User', back_populates='friendships1', foreign_keys='Friendship.user1_id')
     user2 = db.relationship('User', back_populates='friendships2', foreign_keys='Friendship.user2_id')
+
+    __table_args__ = (db.UniqueConstraint('user1_id', 'user2_id', name='friendship_users_uc'),
+                      db.CheckConstraint('user1_id < user2_id', name='friendship_user_ids_sorted_cc'),
+                      db.CheckConstraint('requester >= 1 and requester <=2', 'valid_friendship_requester_cc'),
+                      db.CheckConstraint('status >= 0 and status <=1', 'valid_friendship_status_cc'))

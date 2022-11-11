@@ -5,6 +5,8 @@ from init import db, bcrypt
 from datetime import date, timedelta
 from flask_jwt_extended import create_access_token, get_jwt_identity
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from utils import add_resource_to_db
 
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -21,12 +23,13 @@ def register():
         dob=generate_date(user_data['dob']),
         is_admin=user_data['is_admin']
     )
-
-    db.session.add(user)
-    db.session.commit()
+    add_resource_to_db(user, constraint_errors_config=[
+        ('users_email_key', 409, 'You need to enter a unique email.'),
+        ('users_username_key', 409, 'You need to enter a unique username.'),
+        ('valid_dob_cc', 400, 'You cannot enter a date of birth that is in the future.')
+    ])
 
     token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=3))
-
     return {'user': UserSchema(exclude=['password']).dump(user), 'jwt': token}
 
 
@@ -40,7 +43,6 @@ def login():
         return {'user': UserSchema(exclude=['password']).dump(user), 'jwt': token}
     else:
         return {'error': 'Wrong email or password'}, 401
-
 
 
 

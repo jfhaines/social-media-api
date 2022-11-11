@@ -8,6 +8,8 @@ from controllers.post_react_controller import post_reacts_bp
 from controllers.comment_react_controller import comment_reacts_bp
 from controllers.friendship_controller import friendships_bp
 from cli_commands import db_commands
+from marshmallow.exceptions import ValidationError
+from custom_errors import HttpError
 import os
 
 
@@ -22,6 +24,29 @@ def create_app():
     ma.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
+
+    @app.errorhandler(ValidationError)
+    def validation_error_handler(err):
+        errors = {}
+        for k, v in list(err.messages.items()):
+            message_store = []
+            for subitem in v:
+                message_store.append(subitem)
+            errors['column'] = k
+            errors['message'] = ' '.join(message_store)
+        return {'error': errors}, 400
+    
+    @app.errorhandler(KeyError)
+    def key_error(err):
+        return {'error': f'{err} is a required field.'}, 400
+    
+    @app.errorhandler(404)
+    def not_found(err):
+        return {'error': str(err)}, 404
+
+    @app.errorhandler(HttpError)
+    def custom_http_error(err):
+        return {'error': err.message}, err.code
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
