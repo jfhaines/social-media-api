@@ -13,10 +13,10 @@ class UserSchema(ma.Schema):
     friendships2 = fields.List(fields.Nested('FriendSchema', exclude=['user']))
 
     username = fields.String(required=True, validate=And(
-        Regexp('[a-zA-Z0-9!?]*', error='Invalid characters.'),
+        Regexp('^[a-zA-Z0-9_.-]+$', error='Invalid characters.'),
         Length(min=1, max=100, error='Invalid number of characters.')
         ))
-    email = fields.Email(required=True)
+    email = fields.Email(required=True, validate=Regexp('^[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$', error='Invalid email.'))
     dob = fields.String(required=True)
     password = fields.String(required=True, validate=Length(min=7, error='Invalid number of characters.'))
     is_admin = fields.Boolean(load_default=False)

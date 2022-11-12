@@ -13,10 +13,5 @@ class PostReactSchema(ma.Schema):
     user_id = fields.Integer(required=True)
     post_id = fields.Integer(required=True)
 
-    @validates('date_time')
-    def validate_date_time(self, value):
-        if value >= datetime.now():
-            raise ValidationError('You cannot set a future time and date.')
-
     class Meta:
-        fields = ('id', 'type','datetime', 'user_id', 'post_id')
+        fields = ('id', 'type','date_time', 'user_id', 'post_id')

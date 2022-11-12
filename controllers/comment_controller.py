@@ -9,7 +9,7 @@ from sqlalchemy import select
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from sqlalchemy.exc import IntegrityError
 from custom_errors import HttpError
-from utils import confirm_authorisation, retrieve_resource_by_id, add_resource_to_db
+from utils import confirm_authorisation, retrieve_resource_by_id, add_resource_to_db, check_authentication, is_child
 
 
 comments_bp = Blueprint('comments', __name__, url_prefix='/posts/<int:post_id>/comments')
@@ -18,6 +18,7 @@ comments_bp = Blueprint('comments', __name__, url_prefix='/posts/<int:post_id>/c
 @comments_bp.route('/', methods=['GET'])
 @jwt_required()
 def read_comments(post_id):
+    check_authentication()
     retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     stmt = select(Comment).where(Comment.post_id == post_id)
     comments = db.session.scalars(stmt)
@@ -27,16 +28,19 @@ def read_comments(post_id):
 @comments_bp.route('/<int:comment_id>', methods=['GET'])
 @jwt_required()
 def read_comment(post_id, comment_id):
-    retrieve_resource_by_id(post_id, model=Post, resource_type='post')
+    check_authentication()
+    post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     comment = retrieve_resource_by_id(comment_id, model=Comment, resource_type='comment')
+    is_child(parent=post, child=comment, id_str='post_id')
     return CommentSchema().dump(comment)
 
 
 @comments_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_comment(post_id):
+    check_authentication()
     retrieve_resource_by_id(post_id, model=Post, resource_type='post')
-    comment_data = CommentSchema().load(request.json)
+    comment_data = CommentSchema(exclude=['user_id', 'post_id']).load(request.json)
     comment = Comment(
         text=comment_data.get('text'),
         date_time=datetime.now(),
@@ -51,10 +55,12 @@ def create_comment(post_id):
 @comments_bp.route('/<int:comment_id>', methods=['PUT', 'PATCH'])
 @jwt_required()
 def update_comment(post_id, comment_id):
-    retrieve_resource_by_id(post_id, model=Post, resource_type='post')
-    comment_data = CommentSchema().load(request.json)
+    check_authentication()
+    comment_data = CommentSchema().load(request.json, partial=True)
+    post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     comment = retrieve_resource_by_id(comment_id, model=Comment, resource_type='comment')
-    confirm_authorisation(comment, action='update', resouce_type='comment')
+    is_child(parent=post, child=comment, id_str='post_id')
+    confirm_authorisation(comment, action='update', resource_type='comment')
     comment.text = comment_data.get('text') or comment.text
     db.session.commit()
     return CommentSchema().dump(comment)
@@ -63,9 +69,11 @@ def update_comment(post_id, comment_id):
 @comments_bp.route('/<int:comment_id>', methods=['DELETE'])
 @jwt_required()
 def delete_comment(post_id, comment_id):
-    retrieve_resource_by_id(post_id, model=Post, resource_type='post')
+    check_authentication()
+    post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     comment = retrieve_resource_by_id(comment_id, model=Comment, resource_type='comment')
-    confirm_authorisation(comment, action='delete', resouce_type='comment')
+    is_child(parent=post, child=comment, id_str='post_id')
+    confirm_authorisation(comment, action='delete', resource_type='comment')
     db.session.delete(comment)
     db.session.commit()
     return {'message': f'Comment {comment.id} deleted successfully'}

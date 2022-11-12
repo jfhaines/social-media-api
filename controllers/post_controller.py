@@ -7,7 +7,7 @@ from init import db, bcrypt
 from datetime import date, timedelta, datetime
 from sqlalchemy import select
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-from utils import retrieve_resource_by_id, add_resource_to_db, confirm_authorisation
+from utils import retrieve_resource_by_id, add_resource_to_db, confirm_authorisation, check_authentication
 
 
 posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
@@ -16,6 +16,7 @@ posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 @posts_bp.route('/', methods=['GET'])
 @jwt_required()
 def read_posts():
+    check_authentication()
     stmt = select(Post)
     posts = db.session.scalars(stmt)
     return PostSchema(many=True).dump(posts)
@@ -24,6 +25,7 @@ def read_posts():
 @posts_bp.route('/<int:post_id>', methods=['GET'])
 @jwt_required()
 def read_post(post_id):
+    check_authentication()
     post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     return PostSchema().dump(post)
 
@@ -31,7 +33,8 @@ def read_post(post_id):
 @posts_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_post():
-    post_data = PostSchema().load(request.json)
+    check_authentication()
+    post_data = PostSchema(exclude=['user_id']).load(request.json)
     post = Post(
         title=post_data.get('title'),
         text=post_data.get('text'),
@@ -46,7 +49,8 @@ def create_post():
 @posts_bp.route('/<int:post_id>', methods=['PUT', 'PATCH'])
 @jwt_required()
 def update_post(post_id):
-    post_data = PostSchema().load(request.json)
+    check_authentication()
+    post_data = PostSchema().load(request.json, partial=True)
     post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     confirm_authorisation(post, action='update', resource_type='post')
     post.title = post_data.get('title') or post.title
@@ -58,6 +62,7 @@ def update_post(post_id):
 @posts_bp.route('/<int:post_id>', methods=['DELETE'])
 @jwt_required()
 def delete_post(post_id):
+    check_authentication()
     post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     confirm_authorisation(post, action='delete', resource_type='post')
     db.session.delete(post)

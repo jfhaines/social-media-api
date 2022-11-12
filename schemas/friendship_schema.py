@@ -20,4 +20,4 @@ class FriendshipSchema(ma.Schema):
             raise ValidationError('You cannot set a future time and date.')
 
     class Meta:
-        fields = ('id', 'datetime', 'user1_id', 'user2_id', 'requester', 'status')
+        fields = ('id', 'date_time', 'user1_id', 'user2_id', 'requester', 'status')

@@ -44,9 +44,21 @@ def create_app():
     def not_found(err):
         return {'error': str(err)}, 404
 
+    @app.errorhandler(400)
+    def bad_request(err):
+        return {'error': str(err)}, 400
+    
+    @app.errorhandler(AttributeError)
+    def attribute_error_handler(err):
+        return {'error': str(err)}, 500
+
     @app.errorhandler(HttpError)
     def custom_http_error(err):
         return {'error': err.message}, err.code
+
+    @app.errorhandler(405)
+    def method_not_allowed(err):
+        return {'error': str(err)}, 405
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)

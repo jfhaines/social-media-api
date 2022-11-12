@@ -19,4 +19,4 @@ class CommentReactSchema(ma.Schema):
             raise ValidationError('You cannot set a future time and date.')
 
     class Meta:
-        fields = ('id', 'type','datetime', 'user_id', 'post_id')
+        fields = ('id', 'type', 'date_time', 'user_id', 'comment_id')

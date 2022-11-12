@@ -8,10 +8,7 @@ class CommentSchema(ma.Schema):
     user = fields.Nested('UserSchema', exclude = ['posts', 'comments', 'post_reacts', 'comment_reacts', 'friendships1', 'friendships2'])
     post = fields.Nested('PostSchema')
 
-    text = fields.String(required=True, validate=And(
-        Regexp('[a-zA-Z0-9!?]*', error='Invalid characters'),
-        Length(min=1, max=400, error='Invalid number of characters.')
-        ))
+    text = fields.String(required=True, validate=Length(min=1, max=400, error='Invalid number of characters.'))
     date_time = fields.DateTime(load_default=datetime.now())
     user_id = fields.Integer(required=True)
     post_id = fields.Integer(required=True)
@@ -23,4 +20,4 @@ class CommentSchema(ma.Schema):
 
 
     class Meta:
-        fields = ('id', 'text', 'datetime', 'user_id', 'post_id')
+        fields = ('id', 'text', 'date_time', 'user_id', 'post_id')

@@ -6,7 +6,7 @@ from datetime import date, timedelta
 from sqlalchemy import select
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from controllers.auth_controller import generate_date
-from utils import retrieve_resource_by_id, add_resource_to_db, confirm_authorisation
+from utils import retrieve_resource_by_id, add_resource_to_db, confirm_authorisation, check_authentication
 
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
@@ -15,27 +15,30 @@ users_bp = Blueprint('users', __name__, url_prefix='/users')
 @users_bp.route('/', methods=['GET'])
 @jwt_required()
 def read_users():
+    check_authentication()
     stmt = select(User)
     users = db.session.scalars(stmt)
-    return UserSchema(many=True, exclude=['password', 'dob', 'is_admin']).dump(users)
+    return UserSchema(many=True, exclude=['password']).dump(users)
 
 
 @users_bp.route('/<int:user_id>', methods=['GET'])
 @jwt_required()
 def read_user(user_id):
+    check_authentication()
     user = retrieve_resource_by_id(user_id, model=User, resource_type='user')
-    return UserSchema(exclude=['password', 'dob', 'is_admin']).dump(user)
+    return UserSchema(exclude=['password']).dump(user)
 
 
 @users_bp.route('/<int:user_id>', methods=['PUT', 'PATCH'])
 @jwt_required()
 def update_user(user_id):
-    user_data = UserSchema().load(request.json)
+    check_authentication()
+    user_data = UserSchema().load(request.json, partial=True)
     user = retrieve_resource_by_id(user_id, model=User, resource_type='user')
     confirm_authorisation(user, action='update', resource_type='user')
     user.username = user_data.get('username') or user.username
     user.email = user_data.get('email') or user.email
-    user.password = bcrypt.generate_password_hash(user_data.get('password')) if user_data.get('password') else user.password
+    user.password = bcrypt.generate_password_hash(user_data.get('password')).decode('utf-8') if user_data.get('password') else user.password
     user.is_admin = user_data.get('is_admin') if user_data.get('is_admin') != None else user.is_admin
     user.dob = generate_date(user_data.get('dob')) if user_data.get('dob') else user.dob
     add_resource_to_db(constraint_errors_config=[
@@ -49,6 +52,7 @@ def update_user(user_id):
 @users_bp.route('/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
+    check_authentication()
     user = retrieve_resource_by_id(user_id, model=User, resource_type='user')
     confirm_authorisation(user, action='delete', resource_type='user')
     db.session.delete(user)
