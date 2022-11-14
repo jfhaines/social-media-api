@@ -19,7 +19,7 @@ def read_friendships(user_id):
     # Sends a query to the db asking it to retrieve a user instance that has an id that matches the user_id provided as a parameter in the route.
     # If no user has that id, a customised error message will be sent with an appropriate status code.
     retrieve_resource_by_id(user_id, model=User, resource_type='user')
-    # Sends a query to the db asking to retrieve all friendship instances that have a user1_id or user2_id that matches the user_id provided as a parameter in the route.
+    # Sends a query to the db asking it to retrieve all friendship instances that have a user1_id or user2_id that matches the user_id provided as a parameter in the route.
     stmt = select(Friendship).where(or_(Friendship.user1_id == user_id, Friendship.user2_id == user_id))
     friendships = db.session.scalars(stmt)
     return FriendshipSchema(many=True).dump(friendships)
@@ -62,9 +62,10 @@ def create_friendship(user_id):
         date_time=datetime.now()
     )
     # Sends a query to the db asking it to create a new row in the friendships table which maps to the friendship instance defined above.
-    # During this process, if the constraint listed below is violated, an appropriate error message and status code will be sent in response.
+    # During this process, if the constraints listed below are violated, an appropriate error message and status code will be sent in response.
     add_resource_to_db(friendship, constraint_errors_config=[
-        ('friendship_users_uc', 409, 'These two users already have an existing friendship.')
+        ('friendship_users_uc', 409, 'These two users already have an existing friendship.'),
+        ('friendship_user_ids_sorted_cc', 400, 'user1_id must be smaller than user2_id.')
     ])
     return FriendshipSchema().dump(friendship), 201
 

@@ -1,4 +1,5 @@
 # Social Media RESTFUL API
+[GitHub](https://github.com/jfhaines/social-media-api)
 
 ## R1: Identification of the problem you are trying to solve by building this particular app.
 This backend API serves as the foundation for a social media application. This app allows users to connect with their friends online and share content. These features help solve various problems for the app’s users. For instance, it helps fulfil their need for acquiring new knowledge and their need to socialise and feel connected to others.
@@ -58,11 +59,11 @@ ORMs are so widely adopted in industry as they offer a number of benefits over u
 
 
 ### Read All Posts
-– Endpoint: /posts
-– HTTP Verb: GET
-– Authentication/Authorisation: Must provide valid JWT token in bearer token
-– Required data: None
-– Response data: A JSON object in the response body containing a list of post objects (id, title, text, date_time, user_id)
+- Endpoint: /posts
+- HTTP Verb: GET
+- Authentication/Authorisation: Must provide valid JWT token in bearer token
+- Required data: None
+- Response data: A JSON object in the response body containing a list of post objects (id, title, text, date_time, user_id)
 
 ### Read Single Post
 - Endpoint: /posts/<post_id>
@@ -83,7 +84,7 @@ ORMs are so widely adopted in industry as they offer a number of benefits over u
 - HTTP Verb: PUT, PATCH
 - Authentication/Authorisation: Must provide valid JWT token in bearer token. Must be logged in as the user who created the post.
 - Required data: A post id value in the URI endpoint as a path parameter. A JSON object in the request body containing title (string) and text (string). The title must be within 1 and 150 characters and the text must be within 1 and 400 characters. Both attributes are optional to include. 
-- Response data: A JSON object in the response body containing the created post object (id, title, text, date_time, user_id)
+- Response data: A JSON object in the response body containing the post object (id, title, text, date_time, user_id)
 
 ### Delete Post
 - Endpoint: /posts/<posts_id>
@@ -307,4 +308,6 @@ Similarly to Facebook, this social media API allows users to become friends with
 
 
 ## R10: Describe the way tasks are allocated and tracked in your project
+[Trello Board](https://trello.com/b/FT8SiRsZ/t2a2-api-web-server)
+
 Developing an API, just like developing any technology, requires a degree of flexibility and adaptability in order to respond to the many changes that will take place during the volatile process. Due to this, I decided to follow the agile methodology for project management, which offers an iterative approach to software development, allowing for better responsive to change. More specifically, I decided to adopt a combination of the Scrum and Kanban methodologies, two popular agile frameworks. With the Scrum methodology, you are encouraged to break down the project into intervals or ‘sprints’. In this case, as it is a small project, it only required one sprint. During this sprint, I established a backlog of tasks that need completing, and following the completion of these tasks, I should have delivered all of the working features that will be integrated into the API. To help streamline this process, I adopted Kanban’s philosophy of visualising your workflow by creating and using a Trello board. With Trello, you can arrange your board in a variety of ways. I decided to make each Trello card a ‘user story’, which is a representation of a product feature written from the perspective of the user. These user stories were written and created using the following template: “As a _____, I’d like to _____ so that _____”. With a RESTFUL API, the app provides an interface to the user for accessing and manipulating resources stored in a database. The API generally provides a URI endpoint to represent each resource stored on the database. Users can use these URI endpoints to identify which resource they want to access, in addition to providing a HTTP method or verb, to tell the API which operation they want to perform on the resource. With a RESTFUL API, such as the one being created, the available operations include ‘create’, ‘read’, ‘update’ and ‘delete’. It can be argued that the pairing of an individual resource and a specific operation to be performed on that resource represents a single API feature. For instance, being able to create a new user would be a single feature, with the user being the resource and ‘create’ being the operation performed. As such, each of the user stories identified could generally be mapped to a single pairing of a CRUD operation with a particular resource. With each Trello card representing a product feature, I then had to establish which tasks in the backlog of tasks belong to which feature. Following this, I moved each task to their assigned Trello card, effectively creating groups of tasks within each of these user story cards. The tasks are displayed and represented within each card as an individual item in the card’s ‘checklist’. Following, the Kanban approach, I’ve created four separate columns in the Trello board: a ‘to do’ column, an ‘in progress’ column, a ‘testing’ column and a ‘done’ column. All user story cards were initially placed in the to-do column, representing the backlog of tasks that needed to be completed in the sprint. Cards were ordered in the to-do column in the order they should be completed. I also assigned deadlines for each user story card, to help clarify the order in which they should be completed, in addition to providing guidance on when things should be completed by in order to finish the project on time. To further organise  and classify the cards, I added labels to indicate the level of urgency, either ‘high’, ‘medium’ and ‘low’, as well as providing labels for rough time estimates (e.g. ’30 mins - 1 hr’). When working on the tasks of a particular user story, I updated the board by moving the card that represents the user story being worked on into the ‘in progress’ column. As a rule, I made sure only one card could be in the in progress column at any given time. As I work on the tasks of a particular user story, a tick them off one by one in the card’s checklist as I complete them. Once all tasks on the card have been ticked off, and the checklist is 100% complete, I mark the card as done, and move it to the ‘testing’ column. Once in the testing column, the feature represented by the card must be fully tested via manual testing in Postman. If the API feature represented by the card is able to perform the selected operation on the chosen resource as expected, and is able to handle errors gracefully, its card is then moved to the ‘done’ column. Of course, because I’m following the agile methodology, these cards in the ‘done’ column can be moved back to other columns and additional tasks can be assigned to them if any bugs or new requirements pop up along the way. 
