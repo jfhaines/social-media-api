@@ -17,6 +17,7 @@ posts_bp = Blueprint('posts', __name__, url_prefix='/posts')
 @jwt_required()
 def read_posts():
     check_authentication()
+    # Sends a query to the db asking it to retrieve all post instances.
     stmt = select(Post)
     posts = db.session.scalars(stmt)
     return PostSchema(many=True).dump(posts)
@@ -26,6 +27,8 @@ def read_posts():
 @jwt_required()
 def read_post(post_id):
     check_authentication()
+    # Sends a query to the db asking it to retrieve a post instance that has an id that matches the post_id provided as a parameter in the route.
+    # If no post has that id, a customised error message will be sent with an appropriate status code.
     post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     return PostSchema().dump(post)
 
@@ -41,6 +44,7 @@ def create_post():
         date_time=datetime.now(),
         user_id=get_jwt_identity()
     )
+    # Sends a query to the db asking it to create a new row in the posts table which maps to the post instance defined above.
     db.session.add(post)
     db.session.commit()
     return PostSchema().dump(post), 201
@@ -51,10 +55,13 @@ def create_post():
 def update_post(post_id):
     check_authentication()
     post_data = PostSchema().load(request.json, partial=True)
+    # Sends a query to the db asking it to retrieve a post instance that has an id that matches the post_id provided as a parameter in the route.
+    # If no post has that id, a customised error message will be sent with an appropriate status code.
     post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     confirm_authorisation(post, action='update', resource_type='post')
     post.title = post_data.get('title') or post.title
     post.text = post_data.get('text') or post.text
+    # Sends a query to the db asking it to update the row in the posts table that maps to the post instance above and apply the same changes to it that were made to the model instance.
     db.session.commit()
     return PostSchema().dump(post)
 
@@ -63,8 +70,11 @@ def update_post(post_id):
 @jwt_required()
 def delete_post(post_id):
     check_authentication()
+    # Sends a query to the db asking it to retrieve a post instance that has an id that matches the post_id provided as a parameter in the route.
+    # If no post has that id, a customised error message will be sent with an appropriate status code.
     post = retrieve_resource_by_id(post_id, model=Post, resource_type='post')
     confirm_authorisation(post, action='delete', resource_type='post')
+    # Sends a query to the db asking it to delete the row in the posts table that maps to the provided post instance.
     db.session.delete(post)
     db.session.commit()
     return {'message': f'Post {post.id} deleted successfully'}

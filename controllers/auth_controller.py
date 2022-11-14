@@ -23,6 +23,8 @@ def register():
         dob=generate_date(user_data['dob']),
         is_admin=user_data['is_admin']
     )
+    # Creates and executes a query in the database which creates a new row in the user table which maps to the user instance defined above.
+    # If any of the constraints below are violated during this process, an appropriate error message will be sent in response.
     add_resource_to_db(user, constraint_errors_config=[
         ('users_email_key', 409, 'You need to enter a unique email.'),
         ('users_username_key', 409, 'You need to enter a unique username.'),
@@ -35,6 +37,8 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+    # Creates and executes a query which attempts to retrieve a user instance from the user table which has a username value that matches the username
+    # provided in the request's body
     stmt = select(User).where(User.username == request.json['username'])
     user = db.session.scalar(stmt)
 

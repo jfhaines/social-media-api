@@ -63,6 +63,7 @@ def add_resource_to_db(resource=None, constraint_errors_config=[]):
                 raise HttpError(constraint['http_status'], constraint['err_message'])
 
 def check_authentication():
+    # Requests a user instance from the db that has an id that matches the user_id in the jwt. Ensures the logged in user hasn't been deleted.
     stmt = select(User).where(User.id == get_jwt_identity())
     jwt_user = db.session.scalar(stmt)
     if not jwt_user:
